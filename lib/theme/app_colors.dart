@@ -1,5 +1,8 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
 class AppColors {
   // Primary Colors
   static const Color background = Color(0xFF121212);

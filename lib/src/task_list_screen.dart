@@ -81,7 +81,7 @@ class TaskListPage extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: isCurrentTask ? Colors.blue.withOpacity(0.05) : Colors.white,
+                        // color: isCurrentTask ? Colors.blue.withOpacity(0.05) : Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
@@ -131,7 +131,7 @@ class TaskListPage extends StatelessWidget {
                                             : null,
                                         color: task.isCompleted
                                             ? Colors.grey
-                                            : Colors.black87,
+                                            : Colors.white,
                                       ),
                                     ),
                                     SizedBox(height: 4),
@@ -166,7 +166,7 @@ class TaskListPage extends StatelessWidget {
                                             borderRadius: BorderRadius.circular(12),
                                           ),
                                           child: Text(
-                                            '${taskController.getTypeEmoji(task.type.id)} ${task.type.name}',
+                                            '${task.type.emoji} ${task.type.name}',
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: task.type.color,
@@ -224,7 +224,7 @@ class TaskListPage extends StatelessWidget {
                           children: [
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade50,
+                                // color: Colors.grey.shade50,
                                 borderRadius: BorderRadius.only(
                                   bottomLeft: Radius.circular(16),
                                   bottomRight: Radius.circular(16),
@@ -238,7 +238,7 @@ class TaskListPage extends StatelessWidget {
                                     Container(
                                       padding: EdgeInsets.all(12),
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
+
                                         borderRadius: BorderRadius.circular(12),
                                         border: Border.all(
                                           color: Colors.grey.shade200,

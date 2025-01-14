@@ -3,12 +3,13 @@ import 'dart:ui';
 class TaskType {
   final String id;
   final String name;
-  final Color color; // For UI customization
+  final Color color;
+  final String emoji;
 
   const TaskType({
     required this.id,
     required this.name,
-    required this.color,
+    required this.color,  this.emoji = "📌",
   });
 
   @override
@@ -21,3 +22,4 @@ class TaskType {
   @override
   int get hashCode => id.hashCode;
 }
+

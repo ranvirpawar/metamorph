@@ -10,34 +10,95 @@ class TaskController extends GetxController {
   // Observable lists and values
   final tasks = <Task>[].obs;
   final selectedDate = DateTime.now().obs;
+  // Observable list of task types with default emojis
   final taskTypes = <TaskType>[
     TaskType(
       id: 'work',
       name: 'Work',
       color: Colors.blue,
+      emoji: '👔',
     ),
     TaskType(
       id: 'study',
       name: 'Study',
       color: Colors.purple,
+      emoji: '📚',
+    ),
+    TaskType(
+      id: 'gym',
+      name: 'Gym',
+      color: Colors.red,
+      emoji: '🏋️',
     ),
   ].obs;
 
-  // Method to add new task type
-  void addTaskType(String name, Color color) {
-    final id = name.toLowerCase().replaceAll(' ', '_');
-    if (!taskTypes.any((type) => type.id == id)) {
-      taskTypes.add(TaskType(
-        id: id,
-        name: name,
-        color: color,
-      ));
+  // Updated method to add new task type with emoji support
+  void addTaskType(TaskType newType) {
+    // Ensure the emoji is not null, using the default value if needed
+    final emoji = newType.emoji ?? "📌";
+    final updatedType = TaskType(
+      id: newType.id,
+      name: newType.name,
+      color: newType.color,
+      emoji: emoji,
+    );
+
+    // Check if task type with same ID already exists
+    if (!taskTypes.any((type) => type.id == updatedType.id)) {
+      taskTypes.add(updatedType);
+      taskTypes.sort((a, b) => a.name.compareTo(b.name));
+      taskTypes.refresh();
     }
   }
 
-  // Method to remove task type
+  // Helper method to add task type from individual parameters
+  void addTaskTypeFromParams(String name, Color color, String emoji) {
+    final id = name.toLowerCase().replaceAll(' ', '_');
+    // Ensure emoji is not null
+    final safeEmoji = emoji.isNotEmpty ? emoji : "📌";
+    if (!taskTypes.any((type) => type.id == id)) {
+      final newType = TaskType(
+        id: id,
+        name: name,
+        color: color,
+        emoji: safeEmoji,
+      );
+      addTaskType(newType);
+    }
+  }
+
+  // Method to remove task type (unchanged but included for completeness)
   void removeTaskType(String id) {
+    // Prevent deletion of default types
+    if (id == 'work' || id == 'study') return;
+
     taskTypes.removeWhere((type) => type.id == id);
+    taskTypes.refresh();
+  }
+
+  //Method to update existing task type
+  void updateTaskType(String id, {String? name, Color? color, String? emoji}) {
+    final index = taskTypes.indexWhere((type) => type.id == id);
+    if (index != -1) {
+      final existingType = taskTypes[index];
+      final updatedEmoji = emoji ?? existingType.emoji;  // Use existing emoji if null
+      taskTypes[index] = TaskType(
+        id: id,
+        name: name ?? existingType.name,
+        color: color ?? existingType.color,
+        emoji: updatedEmoji,
+      );
+      taskTypes.refresh();
+    }
+  }
+
+  // Method to get task type by ID
+  TaskType? getTaskType(String id) {
+    try {
+      return taskTypes.firstWhere((type) => type.id == id);
+    } catch (e) {
+      return null;
+    }
   }
 
   // Enhanced addTask method with better routine handling

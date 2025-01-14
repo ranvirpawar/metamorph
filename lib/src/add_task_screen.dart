@@ -5,179 +5,60 @@ import 'package:intl/intl.dart';
 import 'package:metamorph/src/task_controller.dart';
 import 'package:metamorph/src/task_model.dart';
 import 'package:metamorph/src/task_type_modal.dart';
+import 'package:metamorph/theme/app_colors.dart';
+
+import '../components/color_picker_widget.dart';
+import '../components/emoji_picker_widget.dart';
 
 class AddTaskPage extends StatelessWidget {
   final taskController = Get.put(TaskController());
   final titleController = TextEditingController();
   final noteController = TextEditingController();
-  final selectedDate = DateTime
-      .now()
-      .obs;
-  final selectedStartTime = DateTime
-      .now()
-      .obs;
-  final selectedEndTime = DateTime
-      .now()
-      .add(const Duration(hours: 1))
-      .obs;
+  final selectedDate = DateTime.now().obs;
+  final selectedStartTime = DateTime.now().obs;
+  final selectedEndTime = DateTime.now().add(const Duration(hours: 1)).obs;
   final selectedType = TaskController().taskTypes[0].obs;
   final isRoutine = false.obs;
 
   @override
   Widget build(BuildContext context) {
     // Helper method for time picker
-    /*void _showTimePickerSheet(BuildContext context, bool isStartTime) {
-      showModalBottomSheet(
-        context: context,
-        backgroundColor: Colors.transparent,
-        builder: (context) =>
-            Container(
-              height: 300,
-              decoration: BoxDecoration(
-                color: Colors.grey[900],
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(16),
-                    child: Text(
-                      isStartTime ? 'Start Time' : 'End Time',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: CupertinoDatePicker(
-                      mode: CupertinoDatePickerMode.time,
-                      initialDateTime: isStartTime
-                          ? selectedStartTime.value
-                          : selectedEndTime.value,
-                      onDateTimeChanged: (time) {
-                        if (isStartTime) {
-                          selectedStartTime.value = time;
-                        } else {
-                          selectedEndTime.value = time;
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-      );
-    }
-
-     */
-    void _showTimePickerSheet(BuildContext context, bool isStartTime) {
+    void showTimePickerSheet(BuildContext context, bool isStartTime) {
       showModalBottomSheet(
         context: context,
         backgroundColor: Colors.transparent,
         builder: (context) => Container(
-          height: 350,
+          height: 200,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.deepPurple[700]!, Colors.deepPurple[400]!],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black45,
-                blurRadius: 15,
-                spreadRadius: 5,
-              ),
-            ],
+            color: Colors.grey[900],
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Column(
             children: [
-              // Header with title and close button
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      isStartTime ? 'Start Time' : 'End Time',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.close, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ],
+              Container(
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  isStartTime ? 'Start Time' : 'End Time',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-              Divider(
-                color: Colors.white54,
-                thickness: 1,
-                indent: 16,
-                endIndent: 16,
-              ),
-              // Time Picker
               Expanded(
-                child: CupertinoTheme(
-                  data: CupertinoThemeData(
-                    textTheme: CupertinoTextThemeData(
-                      dateTimePickerTextStyle: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                      ),
-                    ),
-                  ),
-                  child: CupertinoDatePicker(
-                    mode: CupertinoDatePickerMode.time,
-                    initialDateTime: isStartTime
-                        ? selectedStartTime.value
-                        : selectedEndTime.value,
-                    onDateTimeChanged: (time) {
-                      if (isStartTime) {
-                        selectedStartTime.value = time;
-                      } else {
-                        selectedEndTime.value = time;
-                      }
-                    },
-                  ),
-                ),
-              ),
-              // Action Buttons
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.redAccent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: Text('Cancel'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        // Handle save action
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.greenAccent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: Text('Save'),
-                    ),
-                  ],
+                child: CupertinoDatePicker(
+                  mode: CupertinoDatePickerMode.time,
+                  initialDateTime: isStartTime
+                      ? selectedStartTime.value
+                      : selectedEndTime.value,
+                  onDateTimeChanged: (time) {
+                    if (isStartTime) {
+                      selectedStartTime.value = time;
+                    } else {
+                      selectedEndTime.value = time;
+                    }
+                  },
                 ),
               ),
             ],
@@ -186,81 +67,222 @@ class AddTaskPage extends StatelessWidget {
       );
     }
 
-// Helper method for adding new task types
-    void _showAddTaskTypeDialog(BuildContext context) {
+    // Helper method for date picker
+    Future<void> showDatePickerBottomSheet(
+        BuildContext context,  selectedDate) async {
+      final date = await showModalBottomSheet<DateTime>(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (context) => Container(
+          height: 200,
+          decoration: BoxDecoration(
+            color: Colors.grey[900],
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(20),
+            ),
+          ),
+          child: Column(
+            children: [
+              Expanded(
+                child: CupertinoDatePicker(
+                  dateOrder: DatePickerDateOrder.ymd,
+                  showDayOfWeek: true,
+                  mode: CupertinoDatePickerMode.date,
+                  initialDateTime: selectedDate.value,
+                  onDateTimeChanged: (date) => selectedDate.value = date,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+      if (date != null) {
+        selectedDate.value = date;
+      }
+    }
+
+    // Helper method for adding new task types
+    void showAddTaskTypeDialog(BuildContext context) {
+      final taskController = Get.find<TaskController>();
       final newTypeController = TextEditingController();
+      final selectedColor = Colors.blue.obs;
+      final selectedEmoji = "📌".obs;
+      final errorText = RxString('');
 
       showDialog(
         context: context,
-        builder: (context) =>
-            Dialog(
-              backgroundColor: Colors.grey[900],
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+        builder: (context) => Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.grey[900],
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Create New Task Type',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 24),
+                TextField(
+                  controller: newTypeController,
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: 'Task type name',
+                    hintStyle: TextStyle(color: Colors.grey[400]),
+                    filled: true,
+                    fillColor: Colors.grey[800],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    prefixIcon: Obx(() => Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        selectedEmoji.value,
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    )),
+                    errorText: errorText.value.isEmpty ? null : errorText.value,
+                    errorStyle: TextStyle(color: Colors.redAccent),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Row(
                   children: [
-                    Text(
-                      'Add New Task Type',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    TextField(
-                      controller: newTypeController,
-                      style: TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        hintText: 'Enter task type name',
-                        hintStyle: TextStyle(color: Colors.grey[600]),
-                        filled: true,
-                        fillColor: Colors.grey[800],
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(color: Colors.grey[400]),
-                          ),
-                        ),
-                        SizedBox(width: 12),
-                        ElevatedButton(
-                          onPressed: () {
-                            // Add new task type logic here
-                            Navigator.pop(context);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Emoji',
+                            style: TextStyle(
+                              color: Colors.grey[400],
+                              fontSize: 16,
                             ),
                           ),
-                          child: Text('Add'),
-                        ),
-                      ],
+                          SizedBox(height: 8),
+                          Obx(() => EmojiPickerButton(
+                            selectedEmoji: selectedEmoji.value,
+                            onEmojiSelected: (emoji) => selectedEmoji.value = emoji,
+                          )),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Color',
+                            style: TextStyle(
+                              color: Colors.grey[400],
+                              fontSize: 16,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Obx(() => ColorPickerButton(
+                            selectedColor: selectedColor.value,
+                            onColorChanged: (color) => selectedColor.value = color as MaterialColor,
+                          )),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ),
+                SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: Colors.grey[400],
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    ElevatedButton(
+                      onPressed: () {
+                        final name = newTypeController.text.trim();
+                        if (name.isEmpty) {
+                          errorText.value = 'Name cannot be empty';
+                          return;
+                        }
+
+                        // Check for duplicate names
+                        if (taskController.taskTypes.any((type) =>
+                        type.name.toLowerCase() == name.toLowerCase())) {
+                          errorText.value = 'Task type already exists';
+                          return;
+                        }
+
+                        // Update TaskType model to include emoji
+                        final  newType = TaskType(
+                          id: name.toLowerCase().replaceAll(' ', '_'),
+                          name: name,
+                          color: selectedColor.value,
+                          emoji: selectedEmoji.value,
+                        );
+                        taskController.addTaskType(newType);
+
+                        Get.back();
+                        Get.snackbar(
+                          'Success',
+                          'Task type "$name" added successfully',
+                          backgroundColor: Colors.green.withOpacity(0.3),
+                          colorText: Colors.white,
+                          snackPosition: SnackPosition.BOTTOM,
+                          margin: EdgeInsets.all(20),
+                          borderRadius: 10,
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: selectedColor.value,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      ),
+                      child: Text(
+                        'Create',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
+          ),
+        ),
       );
     }
+
     void _showDeleteTypeDialog(BuildContext context, TaskType type) {
-      if (type.id == 'work' || type.id == 'study') return; // Prevent deleting default types
+      if (type.id == 'work' || type.id == 'study')
+        return; // Prevent deleting default types
 
       Get.dialog(
         Dialog(
@@ -290,7 +312,9 @@ class AddTaskPage extends StatelessWidget {
             ),
           ),
         ),
-      );}
+      );
+    }
+
     String _getTypeEmoji(String typeId) {
       switch (typeId) {
         case 'work':
@@ -299,7 +323,9 @@ class AddTaskPage extends StatelessWidget {
           return '📚';
         default:
           return '📌';
-      }}
+      }
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -362,57 +388,18 @@ class AddTaskPage extends StatelessWidget {
                     // Date Picker
                     GestureDetector(
                       onTap: () async {
-                        final date = await showModalBottomSheet(
-                          context: context,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) =>
-                              Container(
-                                height: 400,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[900],
-                                  borderRadius: BorderRadius.vertical(
-                                      top: Radius.circular(20)),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.all(16),
-                                      child: Text(
-                                        'Select Date',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: CupertinoDatePicker(
-                                        mode: CupertinoDatePickerMode.date,
-                                        initialDateTime: selectedDate.value,
-                                        minimumDate: DateTime.now(),
-                                        maximumDate: DateTime.now().add(
-                                            Duration(days: 365)),
-                                        onDateTimeChanged: (date) =>
-                                        selectedDate.value = date,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                        );
+                        await showDatePickerBottomSheet(context, selectedDate);
                       },
-                      child: Obx(() =>
-                          Container(
+                      child: Obx(() => Container(
                             padding: EdgeInsets.symmetric(vertical: 12),
                             child: Row(
                               children: [
-                                Icon(Icons.calendar_today, color: Colors.white,
-                                    size: 20),
+                                Icon(Icons.calendar_today,
+                                    color: Colors.white, size: 20),
                                 SizedBox(width: 12),
                                 Text(
-                                  DateFormat('EEE, MMM d').format(
-                                      selectedDate.value),
+                                  DateFormat('EEE, MMM d')
+                                      .format(selectedDate.value),
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,
@@ -430,16 +417,15 @@ class AddTaskPage extends StatelessWidget {
                       children: [
                         Expanded(
                           child: GestureDetector(
-                            onTap: () => _showTimePickerSheet(context, true),
-                            child: Obx(() =>
-                                Row(
+                            onTap: () => showTimePickerSheet(context, true),
+                            child: Obx(() => Row(
                                   children: [
-                                    Icon(Icons.access_time, color: Colors.white,
-                                        size: 20),
+                                    Icon(Icons.access_time,
+                                        color: Colors.white, size: 20),
                                     SizedBox(width: 12),
                                     Text(
-                                      DateFormat('h:mm a').format(
-                                          selectedStartTime.value),
+                                      DateFormat('h:mm a')
+                                          .format(selectedStartTime.value),
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 16,
@@ -451,21 +437,20 @@ class AddTaskPage extends StatelessWidget {
                         ),
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 12),
-                          child: Icon(Icons.arrow_forward, color: Colors
-                              .grey[600], size: 20),
+                          child: Icon(Icons.arrow_forward,
+                              color: Colors.grey[600], size: 20),
                         ),
                         Expanded(
                           child: GestureDetector(
-                            onTap: () => _showTimePickerSheet(context, false),
-                            child: Obx(() =>
-                                Row(
+                            onTap: () => showTimePickerSheet(context, false),
+                            child: Obx(() => Row(
                                   children: [
-                                    Icon(Icons.access_time, color: Colors.white,
-                                        size: 20),
+                                    Icon(Icons.access_time,
+                                        color: Colors.white, size: 20),
                                     SizedBox(width: 12),
                                     Text(
-                                      DateFormat('h:mm a').format(
-                                          selectedEndTime.value),
+                                      DateFormat('h:mm a')
+                                          .format(selectedEndTime.value),
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 16,
@@ -498,7 +483,7 @@ class AddTaskPage extends StatelessWidget {
                         ),
                         IconButton(
                           icon: Icon(Icons.add, color: Colors.white),
-                          onPressed: () => _showAddTaskTypeDialog(context),
+                          onPressed: () => showAddTaskTypeDialog(context),
                         ),
                       ],
                     ),
@@ -506,39 +491,42 @@ class AddTaskPage extends StatelessWidget {
                     Obx(() => Wrap(
                       spacing: 12,
                       runSpacing: 12,
-                      children: taskController.taskTypes.map((type) =>
-                          GestureDetector(
-                            onTap: () => selectedType.value = type,
-                            onLongPress: () => _showDeleteTypeDialog(context, type),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
+                      children: taskController.taskTypes
+                          .map(
+                            (type) => GestureDetector(
+                          onTap: () => selectedType.value = type,
+                          onLongPress: () =>
+                              _showDeleteTypeDialog(context, type),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: selectedType.value.id == type.id
+                                  ? type.color.withOpacity(0.3)
+                                  : Colors.grey[800],
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
                                 color: selectedType.value.id == type.id
-                                    ? type.color.withOpacity(0.3)
-                                    : Colors.grey[800],
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: selectedType.value.id == type.id
-                                      ? type.color
-                                      : Colors.transparent,
-                                  width: 1,
-                                ),
+                                    ? type.color
+                                    : Colors.transparent,
+                                width: 1,
                               ),
-                              child: Text(
-                                '${_getTypeEmoji(type.id)} ${type.name}',
-                                style: TextStyle(
-                                  color: selectedType.value.id == type.id
-                                      ? type.color
-                                      : Colors.grey[400],
-                                  fontSize: 14,
-                                ),
+                            ),
+                            child: Text(
+                              '${type.emoji ?? "📌"} ${type.name ?? " "}',
+                              style: TextStyle(
+                                color: selectedType.value.id == type.id
+                                    ? type.color
+                                    : Colors.grey[400],
+                                fontSize: 14,
                               ),
                             ),
                           ),
-                      ).toList(),
+                        ),
+                      )
+                          .toList(),
                     )),
                   ],
                 ),
@@ -596,12 +584,10 @@ class AddTaskPage extends StatelessWidget {
                         fontSize: 16,
                       ),
                     ),
-                    Obx(() =>
-                        CupertinoSwitch(
-                          value: isRoutine.value,
-                          onChanged: (value) => isRoutine.value = value,
-                          activeColor: Colors.blue,
-                        )),
+                    Obx(() => CupertinoSwitch(
+                        value: isRoutine.value,
+                        onChanged: (value) => isRoutine.value = value,
+                        activeColor: AppColors.accent)),
                   ],
                 ),
               ),
@@ -613,10 +599,7 @@ class AddTaskPage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     final task = Task(
-                      id: DateTime
-                          .now()
-                          .millisecondsSinceEpoch
-                          .toString(),
+                      id: DateTime.now().millisecondsSinceEpoch.toString(),
                       title: titleController.text,
                       date: selectedDate.value,
                       startTime: selectedStartTime.value,
@@ -629,7 +612,6 @@ class AddTaskPage extends StatelessWidget {
                     Get.back();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
