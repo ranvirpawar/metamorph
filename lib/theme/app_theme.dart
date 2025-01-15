@@ -4,7 +4,7 @@ import 'app_colors.dart';
 
 class AppTheme {
   static ThemeData darkAppTheme = ThemeData(
-      scaffoldBackgroundColor: AppColors.backgroundGrey,
+      scaffoldBackgroundColor: AppColors.background,
       primaryColor: AppColors.accent,
       colorScheme: const ColorScheme.dark(
         background: AppColors.background,
@@ -17,10 +17,10 @@ class AppTheme {
 
       // Card Theme
       cardTheme: CardTheme(
-        color: AppColors.cardBackground,
-        elevation: 4,
+        color: Colors.transparent, // We'll use a gradient decoration instead
+        elevation: 0, // We'll handle shadows manually
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
         ),
       ),
 

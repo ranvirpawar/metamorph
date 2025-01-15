@@ -10,6 +10,7 @@ class TaskController extends GetxController {
   // Observable lists and values
   final tasks = <Task>[].obs;
   final selectedDate = DateTime.now().obs;
+  final ValueNotifier<String?> errorMessage = ValueNotifier<String?>(null);
   // Observable list of task types with default emojis
   final taskTypes = <TaskType>[
     TaskType(
