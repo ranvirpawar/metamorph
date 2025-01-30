@@ -13,16 +13,466 @@ import '../components/emoji_picker_widget.dart';
 
 class AddTaskPage extends StatelessWidget {
   final taskController = Get.put(TaskController());
-  final titleController = TextEditingController();
-  final noteController = TextEditingController();
-  final selectedDate = DateTime.now().obs;
-  final selectedStartTime = DateTime.now().obs;
-  final selectedEndTime = DateTime.now().add(const Duration(hours: 1)).obs;
-  final selectedType = TaskController().taskTypes[0].obs;
-  final isRoutine = false.obs;
+  final TextEditingController titleController;
+  final TextEditingController noteController;
+  final Rx<DateTime> selectedDate;
+  final Rx<DateTime> selectedStartTime;
+  final Rx<DateTime> selectedEndTime;
+  final Rx<TaskType> selectedType;
+  final RxBool isRoutine;
+
+  // Constructor to accept the task details
+  AddTaskPage({
+    Key? key,
+     Task? task, // Accept task as parameter
+  })  : titleController = TextEditingController(text: task?.title ?? ''),
+  noteController = TextEditingController(text: task?.note ?? ''),
+  selectedDate = (task?.date ?? DateTime.now()).obs,
+  selectedStartTime = (task?.startTime ?? DateTime.now()).obs,
+  selectedEndTime = (task?.endTime ?? DateTime.now()).obs,
+  selectedType = (task?.type?? TaskController().taskTypes[0]).obs,
+  isRoutine = (task?.isRoutine ?? false).obs,
+  super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        elevation: 0,
+        title: const Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Make it happen, Captain!',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            SizedBox(height: 2,),
+            Text(
+              'Create Task',
+              style: TextStyle(
+                color: Colors.white60,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.close, color: Colors.white),
+          onPressed: () => Get.back(),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Task Name Input with Animation
+              AnimatedContainer(
+                duration: Duration(milliseconds: 300),
+                margin: EdgeInsets.only(bottom: 24),
+                child: TextField(
+                    controller: titleController,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'Plan your day, start here...',
+                      hintStyle: TextStyle(
+                        color: Colors.grey[500],
+                        fontSize: 24,
+                      ),
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+
+                    ),
+                    onChanged: (value) {
+                      if (value.trim().isNotEmpty) {
+                        taskController.errorMessage.value = null;
+                      }
+                    }
+
+                ),
+              ),
+              ValueListenableBuilder<String?>(
+                valueListenable: taskController.errorMessage,
+                builder: (context, value, child) {
+                  return value != null
+                      ? Padding(
+                    padding: const EdgeInsets.only(top: 2.0),
+                    child: Text(
+                      value,
+                      style: const  TextStyle(
+                        color: Colors.red,
+                        fontSize: 16,
+                      ),
+                    ),
+                  )
+                      : SizedBox.shrink();
+                },
+              ),
+
+              // Date and Time Section
+              Container(
+                margin: const EdgeInsets.only(bottom: 24),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[900],
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Date Picker
+                    GestureDetector(
+                      onTap: () async {
+                        await showDatePickerBottomSheet(context, selectedDate);
+                      },
+                      child: Obx(() => Container(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.calendar_today,
+                                color: Colors.white, size: 20),
+                            const SizedBox(width: 12),
+                            Text(
+                              DateFormat('EEE, MMM d')
+                                  .format(selectedDate.value),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
+                    ),
+
+                    Divider(color: Colors.grey[800], height: 24),
+
+                    // Time Range Picker
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => showTimePickerSheet(context, true),
+                            child: Obx(() => Row(
+                              children: [
+                                const Icon(Icons.access_time,
+                                    color: Colors.white, size: 20),
+                                const SizedBox(width: 12),
+                                Text(
+                                  DateFormat('h:mm a')
+                                      .format(selectedStartTime.value),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            )),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Icon(Icons.arrow_forward,
+                              color: Colors.grey[600], size: 20),
+                        ),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => showTimePickerSheet(context, false),
+                            child: Obx(() => Row(
+                              children: [
+                                const Icon(Icons.access_time,
+                                    color: Colors.white, size: 20),
+                                const SizedBox(width: 12),
+                                Text(
+                                  DateFormat('h:mm a')
+                                      .format(selectedEndTime.value),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            )),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              Container(
+                margin: const EdgeInsets.only(bottom: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Task Type',
+                          style: TextStyle(
+                            color: Colors.grey[400],
+                            fontSize: 16,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.add, color: Colors.white),
+                          onPressed: () => showAddTaskTypeDialog(context),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+
+
+                    Obx(() => SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // First Row: 1-3, 7-9, 13-15, ...
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 12,
+                            children: List.generate(taskController.taskTypes.length, (index) {
+                              if (index % 6 < 3) { // Items 1-3, 7-9, 13-15, ...
+                                return GestureDetector(
+                                  onTap: () => selectedType.value = taskController.taskTypes[index],
+                                  onLongPress: () => _showDeleteTypeDialog(context, taskController.taskTypes[index]),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: selectedType.value.id == taskController.taskTypes[index].id
+                                          ? taskController.taskTypes[index].color.withOpacity(0.3)
+                                          : Colors.grey[800],
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: selectedType.value.id == taskController.taskTypes[index].id
+                                            ? taskController.taskTypes[index].color
+                                            : Colors.transparent,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      '${taskController.taskTypes[index].emoji ?? "📌"} ${taskController.taskTypes[index].name ?? " "}',
+                                      style: TextStyle(
+                                        color: selectedType.value.id == taskController.taskTypes[index].id
+                                            ? taskController.taskTypes[index].color
+                                            : Colors.grey[400],
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                              return SizedBox.shrink(); // Empty widget if it doesn't match the condition
+                            }).toList(),
+                          ),
+                          SizedBox(height: 8,),
+                          // Second Row: 4-6, 10-12, 16-18, ...
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 12,
+                            children: List.generate(taskController.taskTypes.length, (index) {
+                              if (index % 6 >= 3 && index % 6 < 6) { // Items 4-6, 10-12, 16-18, ...
+                                return GestureDetector(
+                                  onTap: () => selectedType.value = taskController.taskTypes[index],
+                                  onLongPress: () => _showDeleteTypeDialog(context, taskController.taskTypes[index]),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: selectedType.value.id == taskController.taskTypes[index].id
+                                          ? taskController.taskTypes[index].color.withOpacity(0.3)
+                                          : Colors.grey[800],
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: selectedType.value.id == taskController.taskTypes[index].id
+                                            ? taskController.taskTypes[index].color
+                                            : Colors.transparent,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      '${taskController.taskTypes[index].emoji ?? "📌"} ${taskController.taskTypes[index].name ?? " "}',
+                                      style: TextStyle(
+                                        color: selectedType.value.id == taskController.taskTypes[index].id
+                                            ? taskController.taskTypes[index].color
+                                            : Colors.grey[400],
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                              return SizedBox.shrink(); // Empty widget if it doesn't match the condition
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                    )),
+
+
+                    // Obx(() => Wrap(
+                    //   spacing: 12,
+                    //   runSpacing: 12,
+                    //   children: taskController.taskTypes
+                    //       .map(
+                    //         (type) => GestureDetector(
+                    //       onTap: () => selectedType.value = type,
+                    //       onLongPress: () =>
+                    //           _showDeleteTypeDialog(context, type),
+                    //       child: Container(
+                    //         padding: const EdgeInsets.symmetric(
+                    //           horizontal: 16,
+                    //           vertical: 8,
+                    //         ),
+                    //         decoration: BoxDecoration(
+                    //           color: selectedType.value.id == type.id
+                    //               ? type.color.withOpacity(0.3)
+                    //               : Colors.grey[800],
+                    //           borderRadius: BorderRadius.circular(20),
+                    //           border: Border.all(
+                    //             color: selectedType.value.id == type.id
+                    //                 ? type.color
+                    //                 : Colors.transparent,
+                    //             width: 1,
+                    //           ),
+                    //         ),
+                    //         child: Text(
+                    //           '${type.emoji ?? "📌"} ${type.name ?? " "}',
+                    //           style: TextStyle(
+                    //             color: selectedType.value.id == type.id
+                    //                 ? type.color
+                    //                 : Colors.grey[400],
+                    //             fontSize: 14,
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   )
+                    //       .toList(),
+                    // )),
+                  ],
+                ),
+              ),
+
+              // Notes Section
+              Container(
+                margin: const EdgeInsets.only(bottom: 24),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[900],
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Notes',
+                      style: TextStyle(
+                        color: Colors.grey[400],
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: noteController,
+                      maxLines: null,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'Add your notes here...',
+                        hintStyle: TextStyle(color: Colors.grey[600]),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Routine Toggle
+              Container(
+                margin: const EdgeInsets.only(bottom: 32),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.grey[900],
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Add to Daily Routine',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Obx(() => CupertinoSwitch(
+                        value: isRoutine.value,
+                        onChanged: (value) => isRoutine.value = value,
+                        activeColor: AppColors.accent)),
+                  ],
+                ),
+              ),
+
+              // Save Button
+              Container(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (titleController.text.trim().isEmpty) {
+                      taskController.errorMessage.value = 'Task name cannot be empty';
+                      return;
+                    }
+                    final task = Task(
+                      id: DateTime.now().millisecondsSinceEpoch.toString(),
+                      title: titleController.text,
+                      date: selectedDate.value,
+                      startTime: selectedStartTime.value,
+                      endTime: selectedEndTime.value,
+                      type: selectedType.value,
+                      note: noteController.text,
+                      isRoutine: isRoutine.value,
+                    );
+                    taskController.addTask(task);
+                    Get.back();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'Create Task',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );}
     // Helper method for time picker
     void showTimePickerSheet(BuildContext context, bool isStartTime) {
       showModalBottomSheet(
@@ -67,7 +517,6 @@ class AddTaskPage extends StatelessWidget {
         ),
       );
     }
-
     // Helper method for date picker
     Future<void> showDatePickerBottomSheet(
         BuildContext context,  selectedDate) async {
@@ -312,353 +761,6 @@ class AddTaskPage extends StatelessWidget {
 
 
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        elevation: 0,
-        title: const Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Make it happen, Captain!',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(height: 2,),
-            Text(
-              'Create Task',
-              style: TextStyle(
-                color: Colors.white60,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.close, color: Colors.white),
-          onPressed: () => Get.back(),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Task Name Input with Animation
-              AnimatedContainer(
-                duration: Duration(milliseconds: 300),
-                margin: EdgeInsets.only(bottom: 24),
-                child: TextField(
-                  controller: titleController,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: 'Plan your day, start here...',
-                    hintStyle: TextStyle(
-                      color: Colors.grey[500],
-                      fontSize: 24,
-                    ),
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
 
-                  ),
-                    onChanged: (value) {
-                      if (value.trim().isNotEmpty) {
-                        taskController.errorMessage.value = null;
-                      }
-                    }
-
-                ),
-              ),
-              ValueListenableBuilder<String?>(
-                valueListenable: taskController.errorMessage,
-                builder: (context, value, child) {
-                  return value != null
-                      ? Padding(
-                    padding: const EdgeInsets.only(top: 2.0),
-                    child: Text(
-                      value,
-                      style: const  TextStyle(
-                        color: Colors.red,
-                        fontSize: 16,
-                      ),
-                    ),
-                  )
-                      : SizedBox.shrink();
-                },
-              ),
-
-              // Date and Time Section
-              Container(
-                margin: const EdgeInsets.only(bottom: 24),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.grey[900],
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Date Picker
-                    GestureDetector(
-                      onTap: () async {
-                        await showDatePickerBottomSheet(context, selectedDate);
-                      },
-                      child: Obx(() => Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.calendar_today,
-                                    color: Colors.white, size: 20),
-                                const SizedBox(width: 12),
-                                Text(
-                                  DateFormat('EEE, MMM d')
-                                      .format(selectedDate.value),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )),
-                    ),
-
-                    Divider(color: Colors.grey[800], height: 24),
-
-                    // Time Range Picker
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => showTimePickerSheet(context, true),
-                            child: Obx(() => Row(
-                                  children: [
-                                    const Icon(Icons.access_time,
-                                        color: Colors.white, size: 20),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      DateFormat('h:mm a')
-                                          .format(selectedStartTime.value),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ],
-                                )),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Icon(Icons.arrow_forward,
-                              color: Colors.grey[600], size: 20),
-                        ),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => showTimePickerSheet(context, false),
-                            child: Obx(() => Row(
-                                  children: [
-                                    const Icon(Icons.access_time,
-                                        color: Colors.white, size: 20),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      DateFormat('h:mm a')
-                                          .format(selectedEndTime.value),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ],
-                                )),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              Container(
-                margin: const EdgeInsets.only(bottom: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Task Type',
-                          style: TextStyle(
-                            color: Colors.grey[400],
-                            fontSize: 16,
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.add, color: Colors.white),
-                          onPressed: () => showAddTaskTypeDialog(context),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Obx(() => Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: taskController.taskTypes
-                          .map(
-                            (type) => GestureDetector(
-                          onTap: () => selectedType.value = type,
-                          onLongPress: () =>
-                              _showDeleteTypeDialog(context, type),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: selectedType.value.id == type.id
-                                  ? type.color.withOpacity(0.3)
-                                  : Colors.grey[800],
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: selectedType.value.id == type.id
-                                    ? type.color
-                                    : Colors.transparent,
-                                width: 1,
-                              ),
-                            ),
-                            child: Text(
-                              '${type.emoji ?? "📌"} ${type.name ?? " "}',
-                              style: TextStyle(
-                                color: selectedType.value.id == type.id
-                                    ? type.color
-                                    : Colors.grey[400],
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                          .toList(),
-                    )),
-                  ],
-                ),
-              ),
-
-              // Notes Section
-              Container(
-                margin: const EdgeInsets.only(bottom: 24),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.grey[900],
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Notes',
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: noteController,
-                      maxLines: null,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        hintText: 'Add your notes here...',
-                        hintStyle: TextStyle(color: Colors.grey[600]),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Routine Toggle
-              Container(
-                margin: const EdgeInsets.only(bottom: 32),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.grey[900],
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Add to Daily Routine',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Obx(() => CupertinoSwitch(
-                        value: isRoutine.value,
-                        onChanged: (value) => isRoutine.value = value,
-                        activeColor: AppColors.accent)),
-                  ],
-                ),
-              ),
-
-              // Save Button
-              Container(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (titleController.text.trim().isEmpty) {
-                      taskController.errorMessage.value = 'Task name cannot be empty';
-                      return;
-                    }
-                    final task = Task(
-                      id: DateTime.now().millisecondsSinceEpoch.toString(),
-                      title: titleController.text,
-                      date: selectedDate.value,
-                      startTime: selectedStartTime.value,
-                      endTime: selectedEndTime.value,
-                      type: selectedType.value,
-                      note: noteController.text,
-                      isRoutine: isRoutine.value,
-                    );
-                    taskController.addTask(task);
-                    Get.back();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    'Create Task',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
-}
+

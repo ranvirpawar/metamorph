@@ -14,11 +14,21 @@ dependencies:
   cupertino_icons: ^1.0.6
   get: ^4.6.6
   intl: ^0.20.0
+  hive:
+  hive_flutter:
+  cloud_firestore:
+  firebase_core:
+  firebase_auth:
+  shared_preferences:
+
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  hive_generator:
+  build_runner:
 
 flutter:
   uses-material-design: true
